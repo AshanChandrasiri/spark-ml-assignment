@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leave Request Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .primary-color {
+      background-color: #276FB3;
+    }
+    .primary-color-border {
+      border-color: #276FB3;
+    }
+    .primary-color-text {
+      color: #276FB3;
+    }
+    .primary-color-hover:hover {
+      background-color: #1e5c94;
+    }
+    .primary-color-focus:focus {
+      border-color: #276FB3;
+      box-shadow: 0 0 0 3px rgba(39, 111, 179, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold primary-color-text">Leave Request Form</h1>
+      <a href="#" class="text-sm primary-color-text hover:underline flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to List
+      </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <!-- Form Header -->
+      <div class="primary-color p-6">
+        <h2 class="text-xl font-semibold text-white">New Leave Request</h2>
+        <p class="text-blue-100 mt-1">Please fill in all required fields</p>
+      </div>
+
+      <!-- Form Body -->
+      <form class="p-6">
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Employee Information -->
+          <div class="space-y-6">
+            <h3 class="text-lg font-medium text-gray-800 border-b pb-2">Employee Information</h3>
+
+            <div class="space-y-4">
+              <div>
+                <label for="employeeName" class="block text-sm font-medium text-gray-700 mb-1">Employee Name *</label>
+                <input type="text" id="employeeName" name="employeeName" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+              </div>
+
+              <div>
+                <label for="employeeId" class="block text-sm font-medium text-gray-700 mb-1">Employee ID *</label>
+                <input type="text" id="employeeId" name="employeeId" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+              </div>
+
+              <div>
+                <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                <select id="department" name="department" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+                  <option value="">Select Department</option>
+                  <option value="hr">Human Resources</option>
+                  <option value="it">Information Technology</option>
+                  <option value="finance">Finance</option>
+                  <option value="operations">Operations</option>
+                  <option value="marketing">Marketing</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="position" class="block text-sm font-medium text-gray-700 mb-1">Position *</label>
+                <input type="text" id="position" name="position" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+              </div>
+
+              <div>
+                <label for="supervisor" class="block text-sm font-medium text-gray-700 mb-1">Supervisor *</label>
+                <input type="text" id="supervisor" name="supervisor" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leave Details -->
+          <div class="space-y-6">
+            <h3 class="text-lg font-medium text-gray-800 border-b pb-2">Leave Details</h3>
+
+            <div class="space-y-4">
+              <div>
+                <label for="leaveType" class="block text-sm font-medium text-gray-700 mb-1">Leave Type *</label>
+                <select id="leaveType" name="leaveType" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+                  <option value="">Select Leave Type</option>
+                  <option value="annual">Annual Leave</option>
+                  <option value="sick">Sick Leave</option>
+                  <option value="contractual">Contractual Leave</option>
+                  <option value="emergency">Emergency Leave</option>
+                  <option value="temporary">Temporary Reliever</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                  <input type="date" id="startDate" name="startDate" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+                </div>
+
+                <div>
+                  <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+                  <input type="date" id="endDate" name="endDate" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+                </div>
+              </div>
+
+              <div>
+                <label for="leaveDays" class="block text-sm font-medium text-gray-700 mb-1">Number of Days</label>
+                <input type="number" id="leaveDays" name="leaveDays" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" readonly>
+              </div>
+
+              <div>
+                <label for="employeeType" class="block text-sm font-medium text-gray-700 mb-1">Employee Type *</label>
+                <div class="flex items-center space-x-6 mt-1">
+                  <div class="flex items-center">
+                    <input id="kwt" name="employeeType" type="radio" value="kwt" class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300">
+                    <label for="kwt" class="ml-2 block text-sm text-gray-700">KWT</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="nkwt" name="employeeType" type="radio" value="nkwt" class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300">
+                    <label for="nkwt" class="ml-2 block text-sm text-gray-700">NKWT</label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label for="replacement" class="block text-sm font-medium text-gray-700 mb-1">Replacement Required</label>
+                <div class="flex items-center space-x-6 mt-1">
+                  <div class="flex items-center">
+                    <input id="replacementYes" name="replacement" type="radio" value="true" class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300">
+                    <label for="replacementYes" class="ml-2 block text-sm text-gray-700">Yes</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="replacementNo" name="replacement" type="radio" value="false" class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300">
+                    <label for="replacementNo" class="ml-2 block text-sm text-gray-700">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason for Leave -->
+        <div class="mt-6">
+          <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Reason for Leave *</label>
+          <textarea id="reason" name="reason" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required></textarea>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="mt-6">
+          <h3 class="text-lg font-medium text-gray-800 border-b pb-2">Contact Information During Leave</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div>
+              <label for="contactPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+              <input type="tel" id="contactPhone" name="contactPhone" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border" required>
+            </div>
+
+            <div>
+              <label for="contactEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <input type="email" id="contactEmail" name="contactEmail" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border">
+            </div>
+          </div>
+        </div>
+
+        <!-- Supporting Documents -->
+        <div class="mt-6">
+          <h3 class="text-lg font-medium text-gray-800 border-b pb-2">Supporting Documents</h3>
+
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Attach Documents (if applicable)</label>
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div class="space-y-1 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="flex text-sm text-gray-600">
+                  <label for="file-upload" class="relative cursor-pointer primary-color-text hover:underline font-medium">
+                    <span>Upload a file</span>
+                    <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                  </label>
+                  <p class="pl-1">or drag and drop</p>
+                </div>
+                <p class="text-xs text-gray-500">PDF, PNG, JPG up to 10MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acknowledgment -->
+        <div class="mt-6">
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input id="acknowledgment" name="acknowledgment" type="checkbox" class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300 rounded" required>
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="acknowledgment" class="font-medium text-gray-700">I acknowledge that the information provided is accurate and complete *</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="mt-8 flex justify-end space-x-4">
+          <button type="button" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+            Cancel
+          </button>
+          <button type="submit" class="py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white primary-color primary-color-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Submit Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
