@@ -1,79 +1,47 @@
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("predictionForm").addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent page refresh
+const submitBtn = document.getElementById('submitBtn');
+const loading = document.getElementById('loading');
+const resultDiv = document.getElementById('result');
+const clearBtn = document.getElementById('clearBtn');
+const lyricsInput = document.getElementById('lyrics');
+const modelRadios = document.querySelectorAll('.model-selection');
 
-        // Get selected model
-        let selectedModel = document.querySelector('input[name="model"]:checked');
-        let lyrics = document.getElementById("lyrics").value.trim();
+function checkForm() {
+    const lyrics = lyricsInput.value.trim();
+    const modelSelected = Array.from(modelRadios).some(radio => radio.checked);
+    submitBtn.disabled = !(lyrics && modelSelected);
+}
 
-        // Validation
-        if (!selectedModel) {
-            alert("Please select a model.");
-            return;
-        }
-        if (lyrics === "") {
-            alert("Please enter lyrics.");
-            return;
-        }
+lyricsInput.addEventListener('input', checkForm);
+modelRadios.forEach(radio => radio.addEventListener('change', checkForm));
 
-        // Prepare data
-        let data = {
-            model: selectedModel.value,
-            lyrics: lyrics
-        };
-
-        document.getElementById("predictBtn").style.display = "none";
-        let progressBar = document.getElementById("progressBar");
-        progressBar.style.display = "block";
-
-        let progressFill = document.getElementById("progressFill");
-        let width = 0;
-        let interval = setInterval(() => {
-            if (width >= 100) {
-                clearInterval(interval);
-            } else {
-                width += 10;
-                progressFill.style.width = width + "%";
-            }
-        }, 300);
-
-        // Send POST request to /predict API
-        fetch("/predict", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(result => {
-                alert("Prediction Response: " + JSON.stringify(result))
-
-                clearInterval(interval);
-                progressFill.style.width = "100%";
-
-                document.getElementById("predictionLabel").textContent = result.prediction_label;
-                document.getElementById("predictionScore").textContent = result.prediction_score;
-
-                // Set base64 images
-                document.getElementById("barChartImg").src = result.bar_chart;
-                document.getElementById("pieChartImg").src = result.pie_chart;
-
-                // Show results section
-                document.getElementById("resultSection").style.display = "block";
-
-                // Hide progress bar after completion
-                setTimeout(() => {
-                    progressBar.style.display = "none";
-                }, 500);
-            })
-            .catch(error => {
-                console.error("Error:", error)
-
-                console.error("Error:", error);
-                alert("Failed to get prediction.");
-                document.getElementById("predictBtn").style.display = "block";
-                progressBar.style.display = "none";
-            });
+submitBtn.addEventListener('click', async () => {
+    const selectedModel = document.querySelector('input[name="model"]:checked').value;
+    const lyrics = lyricsInput.value.trim();
+    
+    submitBtn.classList.add('hidden');
+    loading.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    
+    const response = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: selectedModel, lyrics: lyrics })
     });
+    
+    const resp = await response.json();
+    document.getElementById('predictionLabel').textContent = resp.prediction_label;
+    document.getElementById('predictionScore').textContent = resp.prediction_score;
+    document.getElementById('barChart').src = resp.bar_chart;
+    document.getElementById('pieChart').src = resp.pie_chart;
+    
+    loading.classList.add('hidden');
+    submitBtn.classList.remove('hidden');
+    resultDiv.classList.remove('hidden');
+});
+
+clearBtn.addEventListener('click', () => {
+    lyricsInput.value = '';
+    modelRadios.forEach(radio => radio.checked = false);
+    resultDiv.classList.add('hidden');
+    checkForm();
 });

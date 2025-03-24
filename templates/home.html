@@ -3,138 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leave Request Form</title>
+    <title>Songs Genre Prediction System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
-
-    <style>
-        .primary-color {
-            background-color: #276FB3;
-        }
-
-        .primary-color-border {
-            border-color: #276FB3;
-        }
-
-        .primary-color-text {
-            color: #276FB3;
-        }
-
-        .primary-color-hover:hover {
-            background-color: #1e5c94;
-        }
-
-        .primary-color-focus:focus {
-            border-color: #276FB3;
-            box-shadow: 0 0 0 3px rgba(39, 111, 179, 0.25);
-        }
-
-        #progressBar {
-            display: none;
-            width: 100%;
-            height: 20px;
-            background-color: #f3f3f3;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        #progressBar div {
-            height: 100%;
-            width: 0;
-            background-color: #4caf50;
-            text-align: center;
-            line-height: 20px;
-            color: white;
-        }
-
-        #resultSection {
-            display: none;
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
 </head>
-<body class="bg-gray-50">
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold primary-color-text">Leave Request Form</h1>
-        <a href="#" class="text-sm primary-color-text hover:underline flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Back to List
-        </a>
+<body class="bg-white text-blue-900">
+<div class="container mx-auto py-10 text-center">
+    <h1 class="text-3xl font-bold mb-6 flex justify-center items-center gap-2">
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+             xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 19V6l-2 2m8-2l-2-2m8 8c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8z"></path>
+        </svg>
+        Songs Genre Prediction System
+    </h1>
+
+    <div class="bg-blue-50 p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+        <textarea id="lyrics" class="w-full p-3 border border-blue-300 rounded" rows="5"
+                  placeholder="Enter song lyrics..."></textarea>
+        <div class="flex justify-center my-4 gap-4">
+            <label class="flex items-center gap-2">
+                <input type="radio" name="model" value="LR" class="model-selection">
+                Logistic Regression (LR)
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="radio" name="model" value="RF" class="model-selection">
+                Random Forest (RF)
+            </label>
+        </div>
+        <button id="submitBtn" class="bg-blue-500 text-white px-6 py-2 rounded disabled:opacity-50" disabled>Predict
+        </button>
+        <div id="loading" class="hidden mt-4">
+            <div class="w-10 h-10 border-4 border-blue-500 border-solid border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
     </div>
 
-    <!-- Form Card -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-        <!-- Form Header -->
-        <div class="primary-color p-6">
-            <h2 class="text-xl font-semibold text-white">Songs Genre Prediction System</h2>
-            <p class="text-blue-100 mt-1">Please fill in all required fields</p>
+    <div id="result" class="hidden mt-6 max-w-3xl mx-auto text-center">
+        <h2 class="text-2xl font-bold">Predicted Genre: <span id="predictionLabel"></span></h2>
+        <p class="text-lg">Confidence: <span id="predictionScore"></span></p>
+        <div class="flex justify-center gap-4 mt-4">
+            <img id="barChart" class="w-1/2"/>
+            <img id="pieChart" class="w-1/2"/>
         </div>
-
-        <!-- Form Body -->
-        <form class="p-6" id="predictionForm">
-
-            <div>
-                <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Select the Model
-                    *</label>
-                <div class="flex items-center space-x-6 mt-1">
-                    <div class="flex items-center">
-                        <input id="rf" name="model" type="radio" value="kwt"
-                               class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300">
-                        <label for="rf" class="ml-2 block text-sm text-gray-700">Random Forest</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="lr" name="model" type="radio" value="nkwt"
-                               class="focus:ring-0 primary-color-focus h-4 w-4 text-blue-600 border-gray-300">
-                        <label for="lr" class="ml-2 block text-sm text-gray-700">Logistic Regression</label>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-6">
-                <label for="lyrics" class="block text-sm font-medium text-gray-700 mb-1">Enter Lyrics *</label>
-                <textarea id="lyrics" name="reason" rows="4"
-                          class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-0 primary-color-focus px-4 py-2 border"
-                          required></textarea>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="mt-8 flex justify-end space-x-4">
-                <!--                <button type="button"-->
-                <!--                        class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">-->
-                <!--                    Cancel-->
-                <!--                </button>-->
-                <button type="submit" id="predictBtn"
-                        class="py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white primary-color primary-color-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Submit Request
-                </button>
-
-                <div id="progressBar">
-                    <div id="progressFill"></div>
-                </div>
-
-            </div>
-        </form>
-
-
-        <div id="resultSection">
-            <h3>Prediction Result</h3>
-            <p><strong>Label:</strong> <span id="predictionLabel"></span></p>
-            <p><strong>Score:</strong> <span id="predictionScore"></span>%</p>
-            <h4>Charts</h4>
-            <img id="barChartImg" src="" alt="Bar Chart" style="width:300px; height:auto;">
-            <img id="pieChartImg" src="" alt="Pie Chart" style="width:300px; height:auto;">
-        </div>
-
-
+        <button id="clearBtn" class="bg-red-500 text-white px-6 py-2 rounded mt-4">Clear</button>
     </div>
 </div>
+
+<script src="/static/script.js"></script>
 </body>
 </html>
