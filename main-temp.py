@@ -2,10 +2,6 @@ import os
 import traceback
 
 import matplotlib.pyplot as plt
-import matplotlib
-
-matplotlib.use('Agg')
-
 import base64
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify
@@ -24,42 +20,25 @@ from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.ml.classification import LogisticRegressionModel
 
-from pyngrok import ngrok
-import threading
-
 app = Flask(__name__)
 
-model_base_path = "./content/saved_model"
+model_base_path = ".\saved_model"
 spark = (SparkSession.builder.appName("MusicClassification-app")
-         .config("spark.hadoop.io.native.lib", "false")
+         # .config("spark.hadoop.io.nativeio.disabled", "true")
          .getOrCreate())
 
-lr_model_path = os.path.join(model_base_path, "logistic_regression-v2")
-lr_model_path = os.path.abspath(lr_model_path)
+# lr_model = CrossValidatorModel.load("saved_model/logistic_regression-v2")
 
-# if not os.path.exists(lr_model_path):
-#     raise FileNotFoundError(f"Model path not found: {lr_model_path}")
-
-print(lr_model_path)
-lr_model = LogisticRegressionModel.load(lr_model_path)
-word2Vec_model = Word2VecModel.load(os.path.join(model_base_path, 'word2vec-new'))
-
-tokenizer = Tokenizer(inputCol="clean_lyrics", outputCol="words")
-stop_words_remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
-nltk.download("punkt")
-stemmer = PorterStemmer()
 
 label_map = {
-    0: 'pop',
-    1: 'country',
-    2: 'blues',
-    3: 'rock',
-    4: 'jazz',
-    5: 'reggae',
-    6: 'hip hop'
+    1: 'pop',
+    2: 'country',
+    3: 'blues',
+    4: 'rock',
+    5: 'jazz',
+    6: 'reggae',
+    7: 'hip hop'
 }
-
-port = 5000
 
 
 @app.route('/home')
@@ -71,38 +50,54 @@ def home():
 def predict():
     try:
 
-        data = request.json
-        model = data.get("model")
-        lyrics = data.get("lyrics")
-
-        if not model or not lyrics:
-            return jsonify({"error": "Missing model or lyrics"}), 400
-
-        print(data)
-
-        model = lr_model
-
-        # Dummy response (Replace with actual model prediction logic)
-        prediction = f"Prediction using {model} for lyrics: {lyrics[:30]}..."  # Shortened preview
-
-        df = spark.createDataFrame([(lyrics,)], ["lyrics"])
-        df = df.withColumn("clean_lyrics", lower(col("lyrics")))
-        df = df.withColumn("clean_lyrics", regexp_replace(col("clean_lyrics"), "[^a-zA-Z\\s]", ""))
-
-        df = tokenizer.transform(df)
-
-        df = stop_words_remover.transform(df)
-
-        stem_udf = udf(lambda words: [stemmer.stem(word) for word in words], ArrayType(StringType()))
-        df = df.withColumn("stemmed_words", stem_udf(col("filtered_words")))
-
-        df = word2Vec_model.transform(df)
-
-        y_pred = model.transform(df)
-        predicted_genre = label_map[int(y_pred.collect()[0]['prediction'])]
-        prediction_probs = y_pred.collect()[0]["probability"]
-
-        print(f'Prediction result ---> {predicted_genre} {prediction_probs}')
+        # print(os.path.exists(os.path.join(model_base_path, "logistic_regression-v2")))
+        # lr_model_path = os.path.join(model_base_path, "logistic_regression-v2")
+        # # lr_model_path = os.path.abspath(lr_model_path)
+        #
+        # if not os.path.exists(lr_model_path):
+        #     raise FileNotFoundError(f"Model path not found: {lr_model_path}")
+        #
+        # print(lr_model_path)
+        # lr_model = LogisticRegressionModel.load(lr_model_path)
+        # word2Vec_model = Word2VecModel.load(os.path.join(model_base_path, 'word2vec-new'))
+        #
+        # data = request.json
+        # model = data.get("model")
+        # lyrics = data.get("lyrics")
+        #
+        # if not model or not lyrics:
+        #     return jsonify({"error": "Missing model or lyrics"}), 400
+        #
+        # print(data)
+        #
+        # model = lr_model
+        #
+        # # Dummy response (Replace with actual model prediction logic)
+        # prediction = f"Prediction using {model} for lyrics: {lyrics[:30]}..."  # Shortened preview
+        #
+        # spark = SparkSession.builder.appName("MusicClassification").getOrCreate()
+        # df = spark.createDataFrame([(lyrics,)], ["lyrics"])
+        # df = df.withColumn("clean_lyrics", lower(col("lyrics")))
+        # df = df.withColumn("clean_lyrics", regexp_replace(col("clean_lyrics"), "[^a-zA-Z\\s]", ""))
+        #
+        # tokenizer = Tokenizer(inputCol="clean_lyrics", outputCol="words")
+        # df = tokenizer.transform(df)
+        #
+        # stop_words_remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
+        # df = stop_words_remover.transform(df)
+        #
+        # nltk.download("punkt")
+        # stemmer = PorterStemmer()
+        # stem_udf = udf(lambda words: [stemmer.stem(word) for word in words], ArrayType(StringType()))
+        # df = df.withColumn("stemmed_words", stem_udf(col("filtered_words")))
+        #
+        # df = word2Vec_model.transform(df)
+        #
+        # y_pred = model.transform(df)
+        # predicted_genre = label_map[int(y_pred.collect()[0]['prediction'])]
+        # prediction_probs = y_pred.collect()[0]["probability"]
+        #
+        # print(f'Prediction result ---> {predicted_genre} {prediction_probs}')
 
         pred_results = {
             'pop': 0.65,
@@ -140,8 +135,8 @@ def predict():
         bar_image_base64 = base64.b64encode(buffer.getvalue()).decode()
 
         resp = {
-            "prediction_label": predicted_genre,
-            "prediction_score": prediction_probs,
+            "prediction_label": "Hip Pop",
+            "prediction_score": 64,
             "bar_chart": f"data:image/png;base64,{bar_image_base64}",
             "pie_chart": f"data:image/png;base64,{pie_image_base64}"
         }
@@ -155,7 +150,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    public_url = ngrok.connect(port).public_url
-    print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}\"")
-    app.config["BASE_URL"] = public_url
-    threading.Thread(target=app.run, kwargs={"use_reloader": False}).start()
+    app.run(debug=True)
