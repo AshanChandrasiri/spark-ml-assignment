@@ -1,27 +1,22 @@
 import os
 import traceback
 
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
 
 matplotlib.use('Agg')
 
 import base64
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify
-from pyspark.ml.tuning import CrossValidatorModel
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import regexp_replace, lower, col, monotonically_increasing_id, explode, udf
-from pyspark.ml import Pipeline
-from pyspark.ml.feature import Tokenizer, StopWordsRemover, Word2Vec, StringIndexer
-from pyspark.ml.classification import LogisticRegression
+from pyspark.sql.functions import regexp_replace, lower, col, udf
+from pyspark.ml.feature import Tokenizer, StopWordsRemover
 from pyspark.ml.feature import Word2VecModel
 from pyspark.sql.types import ArrayType, StringType
 import nltk
 from nltk.stem import PorterStemmer
-from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
-from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.ml.classification import LogisticRegressionModel
 
 from pyngrok import ngrok
@@ -29,16 +24,13 @@ import threading
 
 app = Flask(__name__)
 
-model_base_path = "./content/saved_model"
+model_base_path = "./saved_model"
 spark = (SparkSession.builder.appName("MusicClassification-app")
          .config("spark.hadoop.io.native.lib", "false")
          .getOrCreate())
 
 lr_model_path = os.path.join(model_base_path, "logistic_regression-v2")
 lr_model_path = os.path.abspath(lr_model_path)
-
-# if not os.path.exists(lr_model_path):
-#     raise FileNotFoundError(f"Model path not found: {lr_model_path}")
 
 print(lr_model_path)
 lr_model = LogisticRegressionModel.load(lr_model_path)
@@ -78,12 +70,7 @@ def predict():
         if not model or not lyrics:
             return jsonify({"error": "Missing model or lyrics"}), 400
 
-        print(data)
-
         model = lr_model
-
-        # Dummy response (Replace with actual model prediction logic)
-        prediction = f"Prediction using {model} for lyrics: {lyrics[:30]}..."  # Shortened preview
 
         df = spark.createDataFrame([(lyrics,)], ["lyrics"])
         df = df.withColumn("clean_lyrics", lower(col("lyrics")))
@@ -100,19 +87,20 @@ def predict():
 
         y_pred = model.transform(df)
         predicted_genre = label_map[int(y_pred.collect()[0]['prediction'])]
-        prediction_probs = y_pred.collect()[0]["probability"]
+        prediction_probs = y_pred.collect()[0]["probability"][int(y_pred.collect()[0]['prediction'])]
 
-        print(f'Prediction result ---> {predicted_genre} {prediction_probs}')
+        # pred_results = {
+        #     'pop': 0.65,
+        #     'country': 0.15,
+        #     'blues': 0.1,
+        #     'rock': 0.01,
+        #     'jazz': 0.02,
+        #     'reggae': 0.05,
+        #     'hip hop': 0.02
+        # }
 
-        pred_results = {
-            'pop': 0.65,
-            'country': 0.15,
-            'blues': 0.1,
-            'rock': 0.01,
-            'jazz': 0.02,
-            'reggae': 0.05,
-            'hip hop': 0.02
-        }
+        probabilities = y_pred.collect()[0]['probability'].toArray()
+        pred_results = {label_map[i]: float(probabilities[i]) for i in range(len(probabilities))}
 
         labels = list(pred_results.keys())
         sizes = list(pred_results.values())
@@ -146,9 +134,8 @@ def predict():
             "pie_chart": f"data:image/png;base64,{pie_image_base64}"
         }
 
-        print(resp)
-
         return jsonify(resp)
+
     except Exception as e:
         print(traceback.format_exc())
         raise e
