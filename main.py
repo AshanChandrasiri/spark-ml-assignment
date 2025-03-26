@@ -24,17 +24,20 @@ import threading
 
 app = Flask(__name__)
 
-model_base_path = "./saved_model"
+BASE_MODEL_PATH = "./saved_model"
+
+XG_BOOST_MODEL_PATH = os.path.abspath(os.path.join(BASE_MODEL_PATH, "xg-boost"))
+LR_MODEL_PATH = os.path.abspath(os.path.join(BASE_MODEL_PATH, "logistic_regression"))
+WORD2VEC_MODEL_PATH = os.path.abspath(os.path.join(BASE_MODEL_PATH, 'word2vec'))
+
 spark = (SparkSession.builder.appName("MusicClassification-app")
          .config("spark.hadoop.io.native.lib", "false")
          .getOrCreate())
 
-lr_model_path = os.path.join(model_base_path, "logistic_regression-v2")
-lr_model_path = os.path.abspath(lr_model_path)
-
-print(lr_model_path)
-lr_model = LogisticRegressionModel.load(lr_model_path)
-word2Vec_model = Word2VecModel.load(os.path.join(model_base_path, 'word2vec-new'))
+# print(lr_model_path)
+lr_model = LogisticRegressionModel.load(LR_MODEL_PATH)
+xg_boost_model = LogisticRegressionModel.load(XG_BOOST_MODEL_PATH)
+word_2_vec_model = Word2VecModel.load(WORD2VEC_MODEL_PATH)
 
 tokenizer = Tokenizer(inputCol="clean_lyrics", outputCol="words")
 stop_words_remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
@@ -48,7 +51,8 @@ label_map = {
     3: 'rock',
     4: 'jazz',
     5: 'reggae',
-    6: 'hip hop'
+    6: 'hip hop',
+    7: 'soul'
 }
 
 port = 5000
@@ -64,13 +68,16 @@ def predict():
     try:
 
         data = request.json
-        model = data.get("model")
+        model_opt = data.get("model")
         lyrics = data.get("lyrics")
 
-        if not model or not lyrics:
+        if not model_opt or not lyrics:
             return jsonify({"error": "Missing model or lyrics"}), 400
 
-        model = lr_model
+        if model_opt == 'XGBOOST':
+            model = xg_boost_model
+        else:
+            model = lr_model
 
         df = spark.createDataFrame([(lyrics,)], ["lyrics"])
         df = df.withColumn("clean_lyrics", lower(col("lyrics")))
@@ -83,7 +90,7 @@ def predict():
         stem_udf = udf(lambda words: [stemmer.stem(word) for word in words], ArrayType(StringType()))
         df = df.withColumn("stemmed_words", stem_udf(col("filtered_words")))
 
-        df = word2Vec_model.transform(df)
+        df = word_2_vec_model.transform(df)
 
         y_pred = model.transform(df)
         predicted_genre = label_map[int(y_pred.collect()[0]['prediction'])]

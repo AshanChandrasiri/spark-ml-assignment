@@ -22,13 +22,14 @@
                   placeholder="Enter song lyrics..."></textarea>
         <div class="flex justify-center my-4 gap-4">
             <label class="flex items-center gap-2">
+                <input type="radio" name="model" value="XGBOOST" class="model-selection">
+                XG-BOOST
+            </label>
+            <label class="flex items-center gap-2">
                 <input type="radio" name="model" value="LR" class="model-selection">
                 Logistic Regression (LR)
             </label>
-            <label class="flex items-center gap-2">
-                <input type="radio" name="model" value="RF" class="model-selection">
-                Random Forest (RF)
-            </label>
+
         </div>
         <button id="submitBtn" class="bg-blue-500 text-white px-6 py-2 rounded disabled:opacity-50" disabled>Predict
         </button>
