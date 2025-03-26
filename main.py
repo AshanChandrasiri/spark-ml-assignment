@@ -18,7 +18,7 @@ from pyspark.sql.types import ArrayType, StringType
 import nltk
 from nltk.stem import PorterStemmer
 from pyspark.ml.classification import LogisticRegressionModel
-
+from xgboost.spark import SparkXGBClassifierModel
 from pyngrok import ngrok
 import threading
 
@@ -36,7 +36,7 @@ spark = (SparkSession.builder.appName("MusicClassification-app")
 
 # print(lr_model_path)
 lr_model = LogisticRegressionModel.load(LR_MODEL_PATH)
-xg_boost_model = LogisticRegressionModel.load(XG_BOOST_MODEL_PATH)
+xg_boost_model = SparkXGBClassifierModel.load(XG_BOOST_MODEL_PATH)
 word_2_vec_model = Word2VecModel.load(WORD2VEC_MODEL_PATH)
 
 tokenizer = Tokenizer(inputCol="clean_lyrics", outputCol="words")
