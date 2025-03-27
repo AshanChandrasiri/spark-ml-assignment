@@ -162,5 +162,5 @@ if __name__ == '__main__':
     # print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}\"")
     # app.config["BASE_URL"] = public_url
     # threading.Thread(target=app.run, kwargs={"use_reloader": False}).start()
-    Timer(2, start_app).start()
+    Timer(1, start_app).start()
     app.run(host="127.0.0.1", port=5000, debug=False)
