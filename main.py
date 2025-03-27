@@ -9,7 +9,7 @@ matplotlib.use('Agg')
 import base64
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify
-
+from threading import Timer
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import regexp_replace, lower, col, udf
 from pyspark.ml.feature import Tokenizer, StopWordsRemover
@@ -21,10 +21,11 @@ from pyspark.ml.classification import LogisticRegressionModel
 from xgboost.spark import SparkXGBClassifierModel
 # from pyngrok import ngrok
 # import threading
+import webbrowser
 
 import pyspark
-print(pyspark.__version__)
 
+print(pyspark.__version__)
 
 app = Flask(__name__)
 
@@ -48,7 +49,6 @@ tokenizer = Tokenizer(inputCol="clean_lyrics", outputCol="words")
 stop_words_remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
 nltk.download("punkt")
 stemmer = PorterStemmer()
-
 
 label_map = {
     0: 'pop',
@@ -153,9 +153,14 @@ def predict():
         raise e
 
 
+def start_app():
+    webbrowser.open_new("http://127.0.0.1:5000")
+
+
 if __name__ == '__main__':
     # public_url = ngrok.connect(port).public_url
     # print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}\"")
     # app.config["BASE_URL"] = public_url
     # threading.Thread(target=app.run, kwargs={"use_reloader": False}).start()
+    Timer(2, start_app).start()
     app.run(host="127.0.0.1", port=5000, debug=False)
