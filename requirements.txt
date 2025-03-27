@@ -3,3 +3,5 @@ pyspark==3.5.5
 nltk==3.9b1
 pyngrok
 xgboost
+numpy
+matplotlib

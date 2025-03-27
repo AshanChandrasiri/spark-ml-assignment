@@ -19,8 +19,12 @@ import nltk
 from nltk.stem import PorterStemmer
 from pyspark.ml.classification import LogisticRegressionModel
 from xgboost.spark import SparkXGBClassifierModel
-from pyngrok import ngrok
-import threading
+# from pyngrok import ngrok
+# import threading
+
+import pyspark
+print(pyspark.__version__)
+
 
 app = Flask(__name__)
 
@@ -32,6 +36,7 @@ WORD2VEC_MODEL_PATH = os.path.abspath(os.path.join(BASE_MODEL_PATH, 'word2vec'))
 
 spark = (SparkSession.builder.appName("MusicClassification-app")
          .config("spark.hadoop.io.native.lib", "false")
+         .config("spark.hadoop.io.nativeio", "false")
          .getOrCreate())
 
 # print(lr_model_path)
@@ -43,6 +48,7 @@ tokenizer = Tokenizer(inputCol="clean_lyrics", outputCol="words")
 stop_words_remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
 nltk.download("punkt")
 stemmer = PorterStemmer()
+
 
 label_map = {
     0: 'pop',
@@ -148,7 +154,8 @@ def predict():
 
 
 if __name__ == '__main__':
-    public_url = ngrok.connect(port).public_url
-    print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}\"")
-    app.config["BASE_URL"] = public_url
-    threading.Thread(target=app.run, kwargs={"use_reloader": False}).start()
+    # public_url = ngrok.connect(port).public_url
+    # print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}\"")
+    # app.config["BASE_URL"] = public_url
+    # threading.Thread(target=app.run, kwargs={"use_reloader": False}).start()
+    app.run(host="127.0.0.1", port=5000, debug=False)
