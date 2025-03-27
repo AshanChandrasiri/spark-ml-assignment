@@ -28,7 +28,7 @@ print(pyspark.__version__)
 
 app = Flask(__name__)
 
-BASE_MODEL_PATH = "./saved_model"
+BASE_MODEL_PATH = "./models"
 
 XG_BOOST_MODEL_PATH = os.path.abspath(os.path.join(BASE_MODEL_PATH, "xg-boost"))
 LR_MODEL_PATH = os.path.abspath(os.path.join(BASE_MODEL_PATH, "logistic_regression"))
@@ -64,7 +64,7 @@ label_map = {
 port = 5000
 
 
-@app.route('/home')
+@app.route('/')
 def home():
     return render_template('home.html')
 
